@@ -1,0 +1,78 @@
+# === Python ===
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.so
+*.egg
+*.egg-info/
+dist/
+build/
+*.log
+*.sqlite3
+*.db
+*.bak
+*.tmp
+*.swp
+
+# Virtual environments
+venv/
+env/
+ENV/
+.venv/
+.env/
+pip-wheel-metadata/
+*.manifest
+
+# Jupyter notebooks
+.ipynb_checkpoints/
+
+# Pytest cache
+.pytest_cache/
+
+# Coverage reports
+htmlcov/
+.coverage
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+*.py,cover
+
+# MyPy, Pylint, etc.
+.mypy_cache/
+.dmypy.json
+.pyre/
+.pytype/
+
+# === Bash / Shell ===
+*.sh~
+*.bash_history
+*.log
+*.out
+*.err
+*.tmp
+*.swp
+
+# === System / Editor ===
+.DS_Store
+Thumbs.db
+desktop.ini
+*.sublime-workspace
+*.sublime-project
+.vscode/
+.idea/
+*.code-workspace
+
+# === Git ===
+*.orig
+*.rej
+*.patch
+
+# === Optional: secrets ===
+.env.local
+.env.secret
+secrets.yml
+*.key
+*.pem
