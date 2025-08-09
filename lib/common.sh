@@ -132,37 +132,70 @@ check_caller_script() {
   fi
 }
 
+
 ################################################################################
 # lock_guard : Empêche l'exécution simultanée du script
 #
-# Vérifie si une autre instance du script est déjà en cours en inspectant
-# les fichiers de verrou (lock) dans /tmp. Si un fichier lock est détecté
-# et que le processus associé est actif, le script est interrompu.
+# Cette fonction vérifie si une autre instance du script est déjà en cours
+# d'exécution en inspectant les fichiers de verrou (lock) dans un répertoire
+# donné. Si un fichier lock est détecté et que le processus associé est actif,
+# le script est interrompu pour éviter les conflits.
 #
-# Crée un fichier lock pour l'instance en cours, et le supprime automatiquement
-# à la fin du script grâce à un mécanisme de nettoyage basé sur `trap`.
+# Le nom du fichier de lock est fourni par l'appelant, et doit inclure le PID.
+# La fonction ajoute l'extension ".lock" si elle est absente.
 #
 # 🔧 Usage :
-#   lock_guard <nom_base_lock>
+#   lock_guard <chemin_complet_avec_pid> [force]
 #
-#   - <nom_base_lock> : préfixe utilisé pour nommer les fichiers lock.
-#     Exemple : "mon_script" → /tmp/mon_script1234.lock
+#   - <chemin_complet_avec_pid> : chemin complet incluant le PID.
+#     Exemple : "/tmp/mon_script_pid1234" → /tmp/mon_script_pid1234.lock
 #
-# 📌 Exemple :
-#   lock_guard "backup_script"
+#   - [force] : chaîne "true" pour ignorer les conflits et forcer l'exécution.
+#
+#   - Si aucun argument n'est fourni, le nom par défaut "/tmp/script_pid" est
+#     utilisé, ce qui génère un fichier lock nommé "/tmp/script_pid.lock".
+#
+# ⚠️ Attention :
+#   - Si le nom fourni se termine par ".lock", l'extension est retirée
+#     automatiquement pour éviter des doublons du type
+#     "mon_script_pid1234.lock.lock". Un message d'avertissement est affiché.
+#
+# 📌 Exemples :
+#   lock_guard "/var/lock/backup1234"     → /var/lock/backup1234.lock
+#   lock_guard "/tmp/mon_script_pid$$"    → /tmp/mon_script_pid12345.lock
+#   lock_guard "/tmp/mon_script_12345"    → /tmp/mon_script_12345.lock
+#   lock_guard                            → /tmp/script_pid.lock
 #
 # 🧹 À propos de `trap` :
-#   Le trap 'rm -f ...' EXIT s'exécute à la fin du script, même en cas d'erreur.
-#   Il ne s'exécute pas si le script est tué par SIGKILL (kill -9).
+#   Le trap 'rm -f ...' EXIT garantit la suppression du fichier lock à la fin
+#   du script, même en cas d'erreur. Il ne s'exécute pas si le processus est
+#   tué brutalement (ex. SIGKILL via kill -9).
 ################################################################################
 lock_guard() {
-  local base_name="${1:-script_pid}"
+  local lock_path="${1:-/tmp/script_pid}"   # Chemin de base du fichier de lock
+  local force_mode="${2:-false}"            # Mode "force" pour ignorer conflit
 
-  # Recherche tous les fichiers lock existants correspondant au motif
-  local lock_files=(/tmp/"${base_name}"*.lock)
+  # 🔧 Nettoyage : retirer l'extension .lock si elle est déjà présente
+  if [[ "${lock_path}" == *.lock ]]; then
+    log_warning "🔧 Le nom fourni se termine par '.lock'."
+    log_warning "L'extension a été retirée automatiquement."
+    log_info "📍 Fichier lock corrigé : ${lock_path}.lock"
+    lock_path="${lock_path%.lock}"
+  fi
+
+  # 📦 Construction du chemin complet du fichier de lock
+  local lock_file="${lock_path}.lock"
+  local lock_dir base_name
+  lock_dir="$(dirname "${lock_path}")"
+  base_name="$(basename "${lock_path}")"
+
+  # 🔍 Recherche des fichiers de lock existants
+  shopt -s nullglob
+  local lock_files=(${lock_dir}/${base_name}*.lock)
+  shopt -u nullglob
+  local conflict=false
 
   if (( ${#lock_files[@]} > 0 )); then
-    log_warning "🔒 Une instance du script semble déjà en cours."
     log_info "📋 Fichiers lock détectés :"
 
     for file in "${lock_files[@]}"; do
@@ -170,19 +203,34 @@ lock_guard() {
       local pid="${filename#${base_name}}"
       pid="${pid%%.lock}"
 
+      # 🚫 Ignorer le fichier de lock du processus courant
+      if [[ "$pid" == "$$" ]]; then
+        continue
+      fi
+
+      # ✅ Vérifier si le processus est encore actif
       if ps -p "$pid" > /dev/null 2>&1; then
         log_info "  - $file (✅ actif)"
+        conflict=true
       else
         log_info "  - $file (❌ inactif)"
+        rm -f "$file" && log_debug "🧹 Fichier lock supprimé : $file"
       fi
     done
-
-    log_fatal "Arrêt du script pour éviter les conflits."
   fi
 
-  echo $$ > "/tmp/${base_name}$$.lock"
+  # 🛑 Si conflit détecté et mode force désactivé, arrêter le script
+  if [[ "$conflict" == true && "$force_mode" != "true" ]]; then
+    log_fatal "Arrêt du script pour éviter les conflits."
+    log_fatal "Utilisez --force pour ignorer les verrous actifs."
+  fi
 
-  trap 'rm -f "/tmp/${base_name}$$.lock"' EXIT
+  # 🔐 Création du fichier de lock pour le processus courant
+  echo $$ > "${lock_file}"
 
-  log_debug "🔓 Fichier lock créé : /tmp/${base_name}$$.lock"
+  # 🧼 Nettoyage automatique du fichier de lock à la fin du script
+  trap 'rm -f "${lock_file}"' EXIT
+
+  log_debug "🔓 Fichier lock créé : ${lock_file}"
 }
+
