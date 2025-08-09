@@ -11,6 +11,7 @@
 # - handle_script_error (gestion des erreurs via trap)
 # - check_caller_script (vérifie l'appelant autorisé)
 # - check_root (vérifie les privilèges root)
+# - lock_guard (empêche les exécutions simultanées)
 #
 # Usage : Ce script doit être sourcé, pas exécuté directement.
 ###############################################################################
@@ -27,12 +28,7 @@
 # Définition des couleurs ANSI (si NOCOLOR ≠ true)
 # -----------------------------------------------------------------------------
 if [[ "${NOCOLOR:-false}" == "true" ]]; then
-  GREEN=''
-  YELLOW=''
-  RED=''
-  BLUE=''
-  LIGHT_BLUE=''
-  NC=''
+  GREEN=''; YELLOW=''; RED=''; BLUE=''; LIGHT_BLUE=''; NC=''
 else
   GREEN='\033[0;32m'
   YELLOW='\033[0;33m'
@@ -53,9 +49,8 @@ log() {
 
   case "${level}" in
     DEBUG)
-      if [[ "${DEBUG:-}" == "true" ]]; then
+      [[ "${DEBUG:-}" == "true" ]] &&
         echo -e "${LIGHT_BLUE}[${timestamp}] [DEBUG] ${message}${NC}" >&2
-      fi
       ;;
     INFO)
       echo -e "${BLUE}[${timestamp}] [INFO] ${message}${NC}"
@@ -135,4 +130,59 @@ check_caller_script() {
   else
     log_info "Script appelant : ${nom_appelant}"
   fi
+}
+
+################################################################################
+# lock_guard : Empêche l'exécution simultanée du script
+#
+# Vérifie si une autre instance du script est déjà en cours en inspectant
+# les fichiers de verrou (lock) dans /tmp. Si un fichier lock est détecté
+# et que le processus associé est actif, le script est interrompu.
+#
+# Crée un fichier lock pour l'instance en cours, et le supprime automatiquement
+# à la fin du script grâce à un mécanisme de nettoyage basé sur `trap`.
+#
+# 🔧 Usage :
+#   lock_guard <nom_base_lock>
+#
+#   - <nom_base_lock> : préfixe utilisé pour nommer les fichiers lock.
+#     Exemple : "mon_script" → /tmp/mon_script1234.lock
+#
+# 📌 Exemple :
+#   lock_guard "backup_script"
+#
+# 🧹 À propos de `trap` :
+#   Le trap 'rm -f ...' EXIT s'exécute à la fin du script, même en cas d'erreur.
+#   Il ne s'exécute pas si le script est tué par SIGKILL (kill -9).
+################################################################################
+lock_guard() {
+  local base_name="${1:-script_pid}"
+
+  # Recherche tous les fichiers lock existants correspondant au motif
+  local lock_files=(/tmp/"${base_name}"*.lock)
+
+  if (( ${#lock_files[@]} > 0 )); then
+    log_warning "🔒 Une instance du script semble déjà en cours."
+    log_info "📋 Fichiers lock détectés :"
+
+    for file in "${lock_files[@]}"; do
+      local filename="${file##*/}"
+      local pid="${filename#${base_name}}"
+      pid="${pid%%.lock}"
+
+      if ps -p "$pid" > /dev/null 2>&1; then
+        log_info "  - $file (✅ actif)"
+      else
+        log_info "  - $file (❌ inactif)"
+      fi
+    done
+
+    log_fatal "Arrêt du script pour éviter les conflits."
+  fi
+
+  echo $$ > "/tmp/${base_name}$$.lock"
+
+  trap 'rm -f "/tmp/${base_name}$$.lock"' EXIT
+
+  log_debug "🔓 Fichier lock créé : /tmp/${base_name}$$.lock"
 }

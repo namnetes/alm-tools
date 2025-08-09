@@ -3,9 +3,9 @@
 # gdrivebak.sh
 #
 # Description : Sauvegarde incrémentale du remote Rclone 'googledrive'
-#               avec versioning.
+#               avec versioning (profondeur 10).
 #
-# Version     : 1.0.0
+# Version     : 2.0.0
 # Auteur      : Magali + Copilot
 ###############################################################################
 
@@ -31,7 +31,8 @@ trap handle_script_error ERR
 # -----------------------------------------------------------------------------
 
 readonly REMOTE_NAME="googledrive"
-readonly SOURCE_PATH="${REMOTE_NAME}:/"
+#readonly SOURCE_PATH="${REMOTE_NAME}:/"
+readonly SOURCE_PATH="${REMOTE_NAME}:/Licences"
 
 readonly BACKUP_BASE="$HOME/backups/${REMOTE_NAME}"
 readonly DEST_PATH="${BACKUP_BASE}/current"
@@ -58,7 +59,7 @@ fi
 
 mkdir -p "${DEST_PATH}" "${BACKUP_DIR_BASE}"
 
-log_info "✅ Prérequis OK. Démarrage de la synchronisation..."
+log_info "✅ Prérequis OK. Démarrage de la sauvegarde..."
 
 # -----------------------------------------------------------------------------
 # DÉBUT DU SCRIPT
@@ -70,24 +71,28 @@ if [[ -e "${LOCK_FILE}" ]]; then
 fi
 touch "${LOCK_FILE}"
 
-if [[ -d "${BACKUP_DIR}" ]]; then
-  log_warning "🕒 Une sauvegarde existe déjà pour ${TIMESTAMP}. Abandon."
-  rm -f "${LOCK_FILE}"
-  exit 0
-fi
+# Créer le dossier de version
 mkdir -p "${BACKUP_DIR}"
 
-log_info "🚀 Démarrage de la sauvegarde vers '${DEST_PATH}'..."
-if rclone sync "${SOURCE_PATH}" "${DEST_PATH}" \
-    --backup-dir="${BACKUP_DIR}" \
-    --log-level=INFO \
-    --progress; then
-  log_success "✅ Sauvegarde terminée avec succès."
-else
-  log_error "❌ La commande Rclone a échoué."
-  rm -f "${LOCK_FILE}"
-  exit 1
-fi
+# Sauvegarder les fichiers modifiés depuis la dernière exécution
+log_info "📦 Archivage des fichiers modifiés..."
+rclone copy "${DEST_PATH}" "${BACKUP_DIR}" \
+  --update \
+  --log-level=INFO \
+  --progress
+
+# Mettre à jour le dossier courant avec les fichiers nouveaux ou modifiés
+log_info "🚀 Synchronisation des fichiers depuis '${SOURCE_PATH}'..."
+rclone copy "${SOURCE_PATH}" "${DEST_PATH}" \
+  --update \
+  --log-level=INFO \
+  --progress
+
+log_success "✅ Sauvegarde incrémentale terminée."
+
+# -----------------------------------------------------------------------------
+# Rotation des versions
+# -----------------------------------------------------------------------------
 
 log_info "🧹 Nettoyage des anciennes versions (max ${MAX_VERSIONS})..."
 cd "${BACKUP_DIR_BASE}" || {
@@ -97,6 +102,10 @@ cd "${BACKUP_DIR_BASE}" || {
 }
 ls -dt */ | tail -n +$((MAX_VERSIONS + 1)) | xargs -r rm -rf
 log_success "🗂️ Rotation terminée. Versions conservées : ${MAX_VERSIONS}"
+
+# -----------------------------------------------------------------------------
+# Fin du script
+# -----------------------------------------------------------------------------
 
 rm -f "${LOCK_FILE}"
 log_info "🏁 Script terminé proprement."
