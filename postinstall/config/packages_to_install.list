@@ -1,0 +1,184 @@
+################################################################################
+# Fichier : packages_to_install.list
+# Description : Liste complète des paquets à installer via APT
+# Chaque ligne contient le nom du paquet suivi d’un commentaire explicatif.
+# Les lignes vides et celles commençant par '#' sont ignorées par le script.
+################################################################################
+
+###################################
+# 🔧 Outils système
+###################################
+build-essential                      # Outils de compilation (gcc, make, etc.)
+sudo                                 # Exécution de commandes avec élévation
+lsb-release                          # Informations sur la distribution
+software-properties-common           # Gestion des dépôts APT
+apt-transport-https                  # Support HTTPS pour APT
+gnome-tweaks                         # Ajustements visuels GNOME
+gnome-shell-extension-manager        # Interface pour extensions GNOME
+gnome-shell-extensions               # Extensions GNOME Shell
+
+
+###################################
+# 🧩 Utilitaires shell
+###################################
+bat              # Afficheur de fichiers avec coloration syntaxique et numéros de ligne
+btop             # Moniteur de ressources système interactif et personnalisable
+colordiff        # Affiche les différences de fichiers avec de la couleur
+curl             # Outil en ligne de commande pour transférer des données avec des URLs
+dos2unix         # Convertit les fichiers texte entre les formats de fin de ligne DOS/Mac et Unix
+fd-find          # Utilitaire de recherche de fichiers rapide et convivial (alternative à 'find')
+fdupes           # Trouve et gère les fichiers dupliqués par leur contenu
+fzf              # Chercheur flou interactif pour la ligne de commande
+jq               # Processeur JSON léger et flexible en ligne de commande
+man-db           # Système de pages de manuel (documentation des commandes)
+meld             # Outil de comparaison et de fusion visuelle de fichiers et de répertoires
+netcat-openbsd   # Utilitaire de réseau polyvalent (lecture/écriture via TCP/UDP)
+pdfgrep          # Recherche de texte dans les fichiers PDF en ligne de commande
+rename           # Renommage de fichiers en masse via expressions régulières (Perl)
+ripgrep          # Utilitaire de recherche de texte rapide (alternative à 'grep')
+strace           # Trace les appels système et les signaux d'un processus
+tree             # Affiche le contenu des répertoires sous forme d'arbre
+wget             # Outil de téléchargement de fichiers depuis le web (HTTP, HTTPS, FTP)
+xclip            # Utilitaire pour manipuler le presse-papiers X11 (copier/coller depuis le terminal)
+zoxide           # Change de répertoire intelligent et rapide (remplacement de 'cd')
+
+
+###################################
+# ⚙️  Environnement dynamique
+###################################
+direnv                               # Chargement automatique des variables par projet
+
+
+###################################
+# 📦 Développement général
+###################################
+exuberant-ctags                      # Génération de tags pour la navigation dans le code source
+git                                  # Gestion de versions distribuée avec Git
+gawk                                 # Traitement avancé de texte avec awk
+gdb                                  # Débogueur pour les programmes C/C++
+indent                               # Reformatage automatique du code source C selon les conventions
+stow                                 # Outil de gestion de symlinks (utile pour config dotfiles)
+
+
+###################################
+# 🐍 Développement Python
+###################################
+python3-full     # Installation complète de Python 3 avec bibliothèques standard, IDLE, venv...
+python3-pip      # Gestionnaire de paquets Python (PyPI)
+python3-pylsp    # Serveur LSP Python pour l’autocomplétion et le linting dans les IDE
+python3-pytest   # Framework moderne pour écrire et exécuter des tests unitaires
+python3-venv     # Outil intégré pour créer des environnements virtuels Python
+sqlite3          # Système de base de données SQL léger embarqué
+sqlite3-doc      # Documentation et exemples pour SQLite
+ 
+# 🔧 À installer via pip — recommandé pour voir les dernières versions
+# et éviter les conflits avec les environnements virtuels Python
+# ------------------------------------------------------------------------------
+# tox                                 # Automatisation des tests sur différents environnements Python
+# flake8                              # Analyse statique du code : erreurs, style, conventions PEP8
+# black                               # Formatage automatique du code source selon les standards Python
+
+
+###################################
+# 📚 Documentation et visualisation
+###################################
+elfutils                             # Outils pour binaires ELF
+graphviz                             # Génération de graphes
+imagemagick                          # Manipulation d’images
+pdfgrep                              # Recherche texte dans PDF
+poppler-utils                        # Outils d’extraction PDF
+
+
+###################################
+# 🖼️ Gestion des photos et images
+###################################
+dupeguru                             # Utilitaire graphique pour trouver les images en double et similaires
+
+
+###################################
+# 🖥️  Interface et GNOME
+###################################
+dconf-editor             # Éditeur GNOME de configuration
+gir1.2-gtk-4.0           # Introspection GObject pour GTK 4
+gnome-calendar           # Calendrier GNOME
+gnome-contacts           # Gestion des contacts
+gnome-user-share         # Partage réseau personnel
+nautilus-admin           # Actions root dans Nautilus
+nautilus-image-converter # Conversion d’images contextuelle
+nautilus-share           # Partage de dossiers Samba
+nautilus-wipe            # Suppression sécurisée
+
+
+###################################
+# 🔐 Sécurité et chiffrement
+###################################
+ecryptfs-utils                       # Dossiers chiffrés
+libpam-pwquality                     # Authentification PAM avec contrôle de mot de passe
+
+
+###################################
+# 📦 Intégrité et vérification de fichiers
+###################################
+hashdeep                             # Calcul et vérification de checksums récursifs (MD5, SHA1, SHA256…)
+rhash                                # Outil rapide pour générer des checksums multiples (MD5, SHA1, SHA256, etc.)
+md5deep                              # Calcul de hash MD5 récursif, vérification et comparaison
+
+
+###################################
+# 🔌 Réseau et partage
+###################################
+bridge-utils                         # Pont réseau (VM, container)
+cifs-utils                           # Montage de partages Windows
+samba                                # Serveur de fichiers SMB/CIFS
+
+
+###################################
+# 💻 Virtualisation KVM
+###################################
+libvirt-clients            # Interface CLI pour libvirt
+libvirt-clients-qemu       # Clients QEMU pour la gestion libvirt
+libvirt-daemon             # Service principal libvirt
+libvirt-daemon-driver-lxc  # Support des containers LXC
+libvirt-daemon-driver-vbox # Support VirtualBox
+qemu-system-x86            # Émulateur x86 KVM
+virt-manager               # GUI de gestion de VM
+virtiofsd                  # Daemon pour le système de fichiers virtio-fs (utile au dossier partagé)
+
+
+###################################
+# 📺 Multimédia et édition
+###################################
+shotcut                              # Montage vidéo open source
+vlc                                  # Lecteur multimédia
+
+
+###################################
+# 🔍 Indexation et recherche
+###################################
+ncdu                                 # Analyse de disque
+plocate                              # Version rapide de locate
+
+
+###################################
+# 🧰 Autres outils utiles
+###################################
+dbus-x11                             # Support D-Bus pour X11
+helix                                # Éditeur de texte modal
+kitty                                # Terminal GPU moderne
+sharutils                            # Archives shell
+
+# Un script gère l'installation non-interactive de certains paquets.
+# Il vise à résoudre un blocage courant avec 'ubuntu-restricted-addons'
+# et 'ubuntu-restricted-extras', notamment 'ttf-mscorefonts-installer'.
+#
+# Problème : L'installation manuelle via 'apt install' affiche une licence
+# via une interface interactive 'debconf' (type 'dialogue'). Cela requiert
+# une action utilisateur (Tab/Entrée).
+#
+# Solution : Préconfigurer 'debconf' pour accepter auto la licence
+# AVANT d'installer le paquet, évitant ainsi l'interaction manuelle.
+#
+# Plus de détails : install_ubuntu-restricted-addons.sh
+# 
+# ubuntu-restricted-addons            # Codecs, etc.
+# ubuntu-restricted-extras            # Polices Microsoft, etc.

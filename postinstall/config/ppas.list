@@ -1,0 +1,5 @@
+ppa:ansible/ansible
+ppa:maveonair/helix-editor
+sudo add-apt-repository ppa:dupeguru/ppa
+# Ajoutez d'autres PPAs ici, un par ligne
+# Les lignes commençant par '#' seront ignorées
