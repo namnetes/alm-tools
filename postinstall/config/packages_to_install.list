@@ -156,7 +156,6 @@ virtiofsd                  # Daemon pour le système de fichiers virtio-fs (util
 shotcut                    # Montage vidéo open source
 vlc                        # Lecteur multimédia
 ffmpeg                     # Outil puissant pour la conversion, l’extraction et le traitement audio/vidéo
-ffprobe                    # Analyseur de flux multimédia, utilisé pour inspecter les métadonnées audio/vidéo
 
 
 ###################################
@@ -170,13 +169,12 @@ plocate                    # Version rapide de locate
 # 🧰 Autres outils utiles
 ###################################
 dbus-x11                   # Support D-Bus pour X11
-helix                      # Éditeur de texte modal
 kitty                      # Terminal GPU moderne
 sharutils                  # Archives shell
 
-# Un script gère l'installation non-interactive de certains paquets.
-# Il vise à résoudre un blocage courant avec 'ubuntu-restricted-addons'
-# et 'ubuntu-restricted-extras', notamment 'ttf-mscorefonts-installer'.
+# Installez manuellement :
+#  'ubuntu-restricted-addons'
+#  'ubuntu-restricted-extras'
 #
 # Problème : L'installation manuelle via 'apt install' affiche une licence
 # via une interface interactive 'debconf' (type 'dialogue'). Cela requiert
@@ -185,7 +183,5 @@ sharutils                  # Archives shell
 # Solution : Préconfigurer 'debconf' pour accepter auto la licence
 # AVANT d'installer le paquet, évitant ainsi l'interaction manuelle.
 #
-# Plus de détails : install_ubuntu-restricted-addons.sh
-# 
 # ubuntu-restricted-addons  # Codecs, etc.
 # ubuntu-restricted-extras  # Polices Microsoft, etc.

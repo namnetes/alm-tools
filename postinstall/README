@@ -1,0 +1,27 @@
+Définir Brave comme navigateur par défaut
+  xdg-settings set default-web-browser brave-browser.desktop
+
+Définir python3 comme commande python
+  update-alternatives --display python
+  sudo update-alternatives --install /usr/bin/python python /usr/bin/python3 1
+
+Définir Kitty comme terminal par défaut
+  sudo update-alternatives --install /usr/bin/x-terminal-emulator x-terminal-emulator /usr/bin/kitty 50
+  sudo update-alternatives --config x-terminal-emulator
+
+Supprimer Firefox (installé via snap)
+  sudo snap disable firefox
+
+  mount | grep firefox
+         /var/lib/snapd/snaps/firefox_7298.snap on /snap/firefox/7298 type squashfs 
+  sudo umount /snap/firefox/7298
+  sudo rm /var/lib/snapd/snaps/firefox_7298.snap
+  sudo rm -rf /var/snap/firefox
+
+  sudo snap remove --purge firefox
+
+  rm -rf ~/snap/firefox/
+  rm -rf ~/.mozilla/firefox/
+
+Installer 
+  sudo apt install ubuntu-restricted-addons ubuntu-restricted-extras

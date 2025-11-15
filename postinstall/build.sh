@@ -20,7 +20,10 @@
 # -----------------------------------------------------------------------------
 # Chargement des fonctions utilitaires
 # -----------------------------------------------------------------------------
-COMMON_LIB="$HOME/alm-tools/lib/common.sh"
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+COMMON_LIB="${SCRIPT_DIR}/../lib/common.sh"
+echo $COMMON_LIB
+#COMMON_LIB="$HOME/alm-tools/lib/common.sh"
 if [[ -f "${COMMON_LIB}" ]]; then
   source "${COMMON_LIB}"
 else
@@ -56,7 +59,7 @@ fi
 #
 # Cela permet de mieux comprendre les erreurs et d'éviter des effets indésirables.
 # -----------------------------------------------------------------------------
-set -euo pipefail
+#set -euo pipefail
 trap handle_script_error ERR
 
 
@@ -120,6 +123,7 @@ source "${SCRIPT_DIR}/modules/install_starship.sh"
 source "${SCRIPT_DIR}/modules/install_githubcli.sh"
 source "${SCRIPT_DIR}/modules/install_fzf.sh"
 source "${SCRIPT_DIR}/modules/install_firacode.sh"
+source "${SCRIPT_DIR}/modules/install_brave.sh"
 source "${SCRIPT_DIR}/modules/cleanup_system.sh"
 source "${SCRIPT_DIR}/modules/update_plocate_db.sh"
 
@@ -129,7 +133,7 @@ source "${SCRIPT_DIR}/modules/update_plocate_db.sh"
 # -----------------------------------------------------------------------------
 
 # Étape 1 : Mise à jour APT
-log_info "Étape 1/13 : Mise à jour du système (APT)."
+log_info "Étape 1/14 : Mise à jour du système (APT)."
 if update_system; then
   log_success "Mise à jour APT terminée."
 else
@@ -137,7 +141,7 @@ else
 fi
 
 # Étape 2 : Mise à jour Snap
-log_info "Étape 2/13 : Mise à jour des paquets Snap."
+log_info "Étape 2/14 : Mise à jour des paquets Snap."
 if update_snap; then
   log_success "Mise à jour Snap terminée."
 else
@@ -145,7 +149,7 @@ else
 fi
 
 # Étape 3 : Nettoyage des paquets inutiles
-log_info "Étape 3/13 : Nettoyage des paquets inutiles."
+log_info "Étape 3/14 : Nettoyage des paquets inutiles."
 if cleanup_packages; then
   log_success "Nettoyage terminé."
 else
@@ -153,7 +157,7 @@ else
 fi
 
 # Étape 4 : Ajout des dépôts PPA
-log_info "Étape 4/13 : Ajout des dépôts PPA."
+log_info "Étape 4/14 : Ajout des dépôts PPA."
 if add_ppas; then
   log_success "Ajout des PPAs terminé."
 else
@@ -161,7 +165,7 @@ else
 fi
 
 # Étape 5 : Installation des paquets essentiels
-log_info "Étape 5/13 : Installation des paquets de base."
+log_info "Étape 5/14 : Installation des paquets de base."
 if install_core_packages; then
   log_success "Installation des paquets essentiels terminée."
 else
@@ -169,7 +173,7 @@ else
 fi
 
 # Étape 6 : Installation du gestionnaire UV
-log_info "Étape 6/13 : Installation du gestionnaire Python UV."
+log_info "Étape 6/14 : Installation du gestionnaire Python UV."
 if install_uv; then
   log_success "UV installé avec succès."
 else
@@ -177,7 +181,7 @@ else
 fi
 
 # Étape 7 : Installation de Xan (CSV Magician)
-log_info "Étape 7/13 : Installation de Xan, outil magique pour les CSV."
+log_info "Étape 7/14 : Installation de Xan, outil magique pour les CSV."
 if install_xan; then
   log_success "Xan installé avec succès."
 else
@@ -185,7 +189,7 @@ else
 fi
 
 # Étape 8 : Installation de EZA (ls modern)
-log_info "Étape 8/13 : Installation de EZA, un ls moderne."
+log_info "Étape 8/14 : Installation de EZA, un ls moderne."
 if install_eza; then
   log_success "eza installé avec succès."
 else
@@ -193,7 +197,7 @@ else
 fi
 
 # Étape 9 : Installation de Starship (prompt universel)
-log_info "Étape 9/13 : Installation de Starship, l’invite multiplateforme."
+log_info "Étape 9/14 : Installation de Starship, l’invite multiplateforme."
 if install_starship; then
   log_success "Starship installé avec succès."
 else
@@ -201,7 +205,7 @@ else
 fi
 
 # Étape 10 : Installation de GitHub CLI
-log_info "Étape 10/13 : Installation de GitHub CLI (gh)."
+log_info "Étape 10/14 : Installation de GitHub CLI (gh)."
 if install_githubcli; then
   log_success "GitHub CLI installé avec succès."
 else
@@ -209,23 +213,31 @@ else
 fi
 
 # Étape 11 : Installation de fzf
-log_info "Étape 11/13 : Installation de fzf."
-if install_fzfe; then
+log_info "Étape 11/14 : Installation de fzf."
+if install_fzf; then
   log_success "fzf installée avec succès."
 else
   log_warning "Échec lors de l'installation de fzf."
 fi
 
 # Étape 12 : Installation de la police FiraCode Nerd Font
-log_info "Étape 12/13 : Installation de la police FiraCode Nerd Font."
+log_info "Étape 12/14 : Installation de la police FiraCode Nerd Font."
 if install_firacode; then
   log_success "FiraCode Nerd Font installée avec succès."
 else
   log_warning "Échec lors de l'installation de la police."
 fi
 
-# Étape 13 : Mise à jour de la base de données plocate
-log_info "Étape 13/13 : Mise à jour de la base plocate."
+# Étape 13 : Installation du navigateur Brave
+log_info "Étape 13/14 : Installation du navigateur brave."
+if install_brave; then
+  log_success "Brave installée avec succès."
+else
+  log_warning "Échec lors de l'installation du navigateur Brave."
+fi
+
+# Étape 14 : Mise à jour de la base de données plocate
+log_info "Étape 14/14 : Mise à jour de la base plocate."
 log_debug "Appel de update_plocate_database..."
 if update_plocate_db; then
   log_success "Mise à jour de la base plocate terminée."
@@ -239,4 +251,11 @@ log_debug "update_plocate_db terminé."
 # -----------------------------------------------------------------------------
 log_info "Toutes les étapes du post-installation ont été exécutées."
 log_success "Script terminé."
+
+# -----------------------------------------------------------------------------
+# Affiche le README
+# -----------------------------------------------------------------------------
+cat ./README
+
+
 exit 0
